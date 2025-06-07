@@ -1,257 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Bacon Social Desktop</title>
+  <meta charset="UTF-8">
+  <title>Bacon Social</title>
   <style>
-    :root {
-      --bg: #fff3f0;
-      --text: #333;
-      --card: #fff;
-      --button: #ff5757;
-      --post: #ffecec;
-      --admin: #fff0d9;
-      --shadow: rgba(0,0,0,0.1);
-    }
-    body.dark {
-      --bg: #1e1e1e;
-      --text: #eee;
-      --card: #2a2a2a;
-      --button: #ff5757;
-      --post: #352323;
-      --admin: #3a320c;
-      --shadow: rgba(255,255,255,0.05);
-    }
-
-    * { box-sizing: border-box; }
     body {
+      font-family: sans-serif;
+      background: #fff3f0;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .window {
-      max-width: 700px;
-      margin: 40px auto 120px;
-      background: var(--card);
-      border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 4px 20px var(--shadow);
     }
-
-    h1 { color: var(--button); }
-
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      font-size: 15px;
-      border-radius: 6px;
-      border: 2px solid var(--button);
+    h1 {
+      color: #ff5757;
+      text-align: center;
     }
-
-    button {
-      background: var(--button);
-      color: white;
-      cursor: pointer;
-    }
-
-    .post {
+    .input-group {
       margin: 10px 0;
-      background: var(--post);
-      padding: 10px;
-      border-radius: 8px;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
     }
-
-    .admin {
-      background: var(--admin);
-      border-left: 5px solid gold;
+    input[type="text"], input[type="color"] {
+      padding: 8px;
+      border: 2px solid #ff5757;
+      border-radius: 5px;
+      margin-right: 5px;
     }
-
-    .pfp {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--button);
-    }
-
-    #taskbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #222;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      z-index: 999;
-    }
-
-    #startBtn {
-      background: #444;
+    button {
+      background: #ff5757;
       color: white;
       padding: 8px 16px;
       border: none;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
     }
-
-    #startMenu {
-      position: fixed;
-      bottom: 48px;
-      left: 12px;
-      background: white;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      width: 180px;
-      display: none;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    #startMenu button {
-      width: 100%;
+    .post {
+      background: #ffe4e1;
       padding: 10px;
-      background: white;
-      border: none;
-      text-align: left;
-      font-size: 14px;
-      cursor: pointer;
+      border-radius: 8px;
+      margin: 10px 0;
+      position: relative;
     }
-
-    #startMenu button:hover {
-      background: #f0f0f0;
+    .admin-tag {
+      color: #fff;
+      background: #ff5757;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      margin-left: 5px;
     }
-
-    #settingsPanel {
-      display: none;
-      position: fixed;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
-      background: white;
-      border: 2px solid var(--button);
-      padding: 20px;
-      border-radius: 12px;
-      z-index: 1000;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-    }
-
-    #overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 999;
+    .badge {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="window">
-    <h1>🥓 Bacon Social</h1>
-    <input type="text" id="textPost" placeholder="What's on your mind?">
-    <button onclick="postText()">Post</button>
-    <div id="feed"></div>
-  </div>
+  <h1>Bacon Social</h1>
 
-  <!-- Settings Panel -->
-  <div id="overlay" onclick="hideSettings()"></div>
-  <div id="settingsPanel">
-    <h3>Settings</h3>
-    <input type="text" id="username" placeholder="Your name">
-    <input type="color" id="profileColor" value="#ff5757">
-    <input type="file" id="profilePicUpload" accept="image/*">
-    <img id="pfpPreview" style="width:60px;height:60px;border-radius:50%;margin-top:10px;display:none">
-    <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
+  <div class="input-group">
+    <input type="text" id="username" placeholder="Your name" />
+    <input type="color" id="profileColor" value="#ff5757" />
     <button onclick="saveSettings()">Save Settings</button>
-    <button onclick="hideSettings()">Close</button>
   </div>
 
-  <!-- Taskbar -->
-  <div id="taskbar">
-    <button id="startBtn" onclick="toggleStartMenu()">Start</button>
+  <div class="input-group">
+    <input type="text" id="textPost" placeholder="Write something bacon-y..." style="width: 300px;" />
+    <button onclick="postText()">Post</button>
   </div>
 
-  <!-- Start Menu -->
-  <div id="startMenu">
-    <button onclick="openSettings()">👤 Profile Settings</button>
-    <button onclick="alert('Bacon Social with Dark Mode and Profile Pictures\nBy DTR')">ℹ️ About</button>
-  </div>
+  <div id="feed"></div>
 
   <script>
     const adminNames = ["DaymianGT", "NovaGT"];
+    const EARLY_ACCESS_DATE = new Date("2025-09-02");
+    const badgeURL = "https://th.bing.com/th/id/OIP.uHG9SVAGrJvkhsQHbqRb5gAAAA?rs=1&pid=ImgDetMain";
 
-    function toggleStartMenu() {
-      const menu = document.getElementById("startMenu");
-      menu.style.display = menu.style.display === "block" ? "none" : "block";
-    }
-
-    function openSettings() {
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("settingsPanel").style.display = "block";
-      document.getElementById("startMenu").style.display = "none";
-      loadSettings();
-    }
-
-    function hideSettings() {
-      document.getElementById("overlay").style.display = "none";
-      document.getElementById("settingsPanel").style.display = "none";
-    }
-
-    function loadSettings() {
-      document.getElementById("username").value = localStorage.getItem("baconUsername") || "";
-      document.getElementById("profileColor").value = localStorage.getItem("baconColor") || "#ff5757";
-      const pfp = localStorage.getItem("baconPFP");
-      if (pfp) {
-        document.getElementById("pfpPreview").src = pfp;
-        document.getElementById("pfpPreview").style.display = "block";
+    function ensureJoinDate() {
+      if (!localStorage.getItem("baconJoinDate")) {
+        localStorage.setItem("baconJoinDate", new Date().toISOString());
       }
-      document.getElementById("darkModeToggle").checked = localStorage.getItem("baconDarkMode") === "true";
-      document.body.classList.toggle("dark", document.getElementById("darkModeToggle").checked);
     }
 
     function saveSettings() {
       const name = document.getElementById("username").value.trim();
       const color = document.getElementById("profileColor").value;
-      const dark = document.getElementById("darkModeToggle").checked;
-
       if (!name) return;
-
-      const adminRegistry = JSON.parse(localStorage.getItem("baconAdmins") || "{}");
-      if (adminNames.includes(name) && !adminRegistry[name]) {
-        adminRegistry[name] = true;
-        localStorage.setItem("baconAdmins", JSON.stringify(adminRegistry));
-        localStorage.setItem("baconIsAdmin", "true");
-      } else {
-        localStorage.setItem("baconIsAdmin", adminRegistry[name] ? "true" : "false");
-      }
-
+      ensureJoinDate();
       localStorage.setItem("baconUsername", name);
       localStorage.setItem("baconColor", color);
-      localStorage.setItem("baconDarkMode", dark);
-      document.body.classList.toggle("dark", dark);
-
-      hideSettings();
+      localStorage.setItem("baconIsAdmin", adminNames.includes(name) ? "true" : "false");
       renderFeed();
     }
-
-    document.getElementById("profilePicUpload").addEventListener("change", function () {
-      const file = this.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        localStorage.setItem("baconPFP", e.target.result);
-        document.getElementById("pfpPreview").src = e.target.result;
-        document.getElementById("pfpPreview").style.display = "block";
-      };
-      reader.readAsDataURL(file);
-    });
 
     function postText() {
       const text = document.getElementById("textPost").value.trim();
@@ -260,46 +100,57 @@
       const name = localStorage.getItem("baconUsername") || "Anonymous";
       const color = localStorage.getItem("baconColor") || "#ff5757";
       const isAdmin = localStorage.getItem("baconIsAdmin") === "true";
-      const pfp = localStorage.getItem("baconPFP") || "";
+      const joinDate = localStorage.getItem("baconJoinDate") || new Date().toISOString();
 
       let posts = JSON.parse(localStorage.getItem("baconPosts") || "[]");
-      posts.unshift({
-        text,
-        name,
-        color,
-        time: new Date().toLocaleTimeString(),
-        admin: isAdmin,
-        pfp
-      });
-
+      posts.unshift({ text, name, color, time: new Date().toLocaleTimeString(), admin: isAdmin, joinDate });
       localStorage.setItem("baconPosts", JSON.stringify(posts));
       document.getElementById("textPost").value = "";
       renderFeed();
     }
 
+    function isEarlyAccess(joinDateStr, isAdmin, name) {
+      try {
+        const date = new Date(joinDateStr);
+        return date < EARLY_ACCESS_DATE || (isAdmin && adminNames.includes(name));
+      } catch {
+        return false;
+      }
+    }
+
     function renderFeed() {
       const feed = document.getElementById("feed");
-      feed.innerHTML = "";
       const posts = JSON.parse(localStorage.getItem("baconPosts") || "[]");
-      posts.slice(0, 20).forEach(post => {
-        const div = document.createElement("div");
-        div.className = "post" + (post.admin ? " admin" : "");
-        const label = post.admin ? `${post.name} (Admin)` : post.name;
-        const img = post.pfp ? `<img src="${post.pfp}" class="pfp">` : `<div class="pfp" style="background:${post.color}"></div>`;
-        div.innerHTML = `${img}<div><strong style="color:${post.color}">${label}</strong><br>${post.text}<br><small>${post.time}</small></div>`;
-        feed.appendChild(div);
+      feed.innerHTML = "";
+
+      posts.slice(0, 10).forEach(post => {
+        const postDiv = document.createElement("div");
+        postDiv.className = "post";
+        postDiv.style.background = post.color || "#ffe4e1";
+
+        const isEarly = isEarlyAccess(post.joinDate, post.admin, post.name);
+        const label = post.admin ? `${post.name} <span class='admin-tag'>Admin</span>` : post.name;
+
+        postDiv.innerHTML = `
+          <strong>${label}</strong>: ${post.text}
+          <div style="font-size: 12px; margin-top: 4px;">${post.time}</div>
+        `;
+
+        if (isEarly) {
+          const badge = document.createElement("img");
+          badge.className = "badge";
+          badge.src = badgeURL;
+          postDiv.appendChild(badge);
+        }
+
+        feed.appendChild(postDiv);
       });
     }
 
     window.onload = () => {
-      loadSettings();
+      document.getElementById("username").value = localStorage.getItem("baconUsername") || "";
+      document.getElementById("profileColor").value = localStorage.getItem("baconColor") || "#ff5757";
       renderFeed();
-    };
-
-    window.onclick = (e) => {
-      if (!e.target.closest("#startMenu") && e.target.id !== "startBtn") {
-        document.getElementById("startMenu").style.display = "none";
-      }
     };
   </script>
 </body>
