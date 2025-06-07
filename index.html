@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Bacon Social</title>
   <style>
     body {
       font-family: sans-serif;
-      background: #fff3f0;
+      background: #e6f0ff;
       margin: 0;
       padding: 20px;
+      color: #2f1b0c;
     }
     h1 {
-      color: #ff5757;
+      color: #2f1b0c;
       text-align: center;
     }
     .input-group {
@@ -19,12 +20,12 @@
     }
     input[type="text"], input[type="color"] {
       padding: 8px;
-      border: 2px solid #ff5757;
+      border: 2px solid #2f1b0c;
       border-radius: 5px;
       margin-right: 5px;
     }
     button {
-      background: #ff5757;
+      background: #2f1b0c;
       color: white;
       padding: 8px 16px;
       border: none;
@@ -32,15 +33,16 @@
       cursor: pointer;
     }
     .post {
-      background: #ffe4e1;
+      background: #d6d6ff;
       padding: 10px;
       border-radius: 8px;
       margin: 10px 0;
       position: relative;
+      word-wrap: break-word;
     }
     .admin-tag {
       color: #fff;
-      background: #ff5757;
+      background: #2f1b0c;
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 10px;
@@ -59,8 +61,8 @@
   <h1>Bacon Social</h1>
 
   <div class="input-group">
-    <input type="text" id="username" placeholder="Your name" />
-    <input type="color" id="profileColor" value="#ff5757" />
+    <input type="text" id="username" placeholder="Your name (leave blank for bacon####)" />
+    <input type="color" id="profileColor" value="#2f1b0c" />
     <button onclick="saveSettings()">Save Settings</button>
   </div>
 
@@ -72,9 +74,8 @@
   <div id="feed"></div>
 
   <script>
-    const adminNames = ["DaymianGT", "NovaGT"];
-    const EARLY_ACCESS_DATE = new Date("2025-09-02");
     const badgeURL = "https://th.bing.com/th/id/OIP.uHG9SVAGrJvkhsQHbqRb5gAAAA?rs=1&pid=ImgDetMain";
+    const EARLY_ACCESS_DATE = new Date("2025-09-02");
 
     function ensureJoinDate() {
       if (!localStorage.getItem("baconJoinDate")) {
@@ -82,14 +83,38 @@
       }
     }
 
+    function isAdminUser(name) {
+      return name === "bacon729" || name === "iamthegreatest0";
+    }
+
+    function isEarlyAccessUser(name, joinDateStr) {
+      try {
+        const date = new Date(joinDateStr);
+        return name === "bacon729" || name === "iamthegreatest0" || date < EARLY_ACCESS_DATE;
+      } catch {
+        return false;
+      }
+    }
+
     function saveSettings() {
-      const name = document.getElementById("username").value.trim();
+      let name = document.getElementById("username").value.trim();
       const color = document.getElementById("profileColor").value;
-      if (!name) return;
+
+      if (!name) {
+        // Generate bacon#### with 4-digit random number
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        name = "bacon" + randomNum;
+      }
+
       ensureJoinDate();
+
       localStorage.setItem("baconUsername", name);
       localStorage.setItem("baconColor", color);
-      localStorage.setItem("baconIsAdmin", adminNames.includes(name) ? "true" : "false");
+
+      const isAdmin = isAdminUser(name);
+      localStorage.setItem("baconIsAdmin", isAdmin ? "true" : "false");
+
+      document.getElementById("username").value = name;
       renderFeed();
     }
 
@@ -98,8 +123,8 @@
       if (!text) return;
 
       const name = localStorage.getItem("baconUsername") || "Anonymous";
-      const color = localStorage.getItem("baconColor") || "#ff5757";
-      const isAdmin = localStorage.getItem("baconIsAdmin") === "true";
+      const color = localStorage.getItem("baconColor") || "#2f1b0c";
+      const isAdmin = isAdminUser(name);
       const joinDate = localStorage.getItem("baconJoinDate") || new Date().toISOString();
 
       let posts = JSON.parse(localStorage.getItem("baconPosts") || "[]");
@@ -107,15 +132,6 @@
       localStorage.setItem("baconPosts", JSON.stringify(posts));
       document.getElementById("textPost").value = "";
       renderFeed();
-    }
-
-    function isEarlyAccess(joinDateStr, isAdmin, name) {
-      try {
-        const date = new Date(joinDateStr);
-        return date < EARLY_ACCESS_DATE || (isAdmin && adminNames.includes(name));
-      } catch {
-        return false;
-      }
     }
 
     function renderFeed() {
@@ -126,9 +142,9 @@
       posts.slice(0, 10).forEach(post => {
         const postDiv = document.createElement("div");
         postDiv.className = "post";
-        postDiv.style.background = post.color || "#ffe4e1";
+        postDiv.style.background = post.color || "#d6d6ff";
 
-        const isEarly = isEarlyAccess(post.joinDate, post.admin, post.name);
+        const earlyAccess = isEarlyAccessUser(post.name, post.joinDate);
         const label = post.admin ? `${post.name} <span class='admin-tag'>Admin</span>` : post.name;
 
         postDiv.innerHTML = `
@@ -136,10 +152,11 @@
           <div style="font-size: 12px; margin-top: 4px;">${post.time}</div>
         `;
 
-        if (isEarly) {
+        if (earlyAccess) {
           const badge = document.createElement("img");
           badge.className = "badge";
           badge.src = badgeURL;
+          badge.alt = "Early Access Badge";
           postDiv.appendChild(badge);
         }
 
@@ -149,7 +166,7 @@
 
     window.onload = () => {
       document.getElementById("username").value = localStorage.getItem("baconUsername") || "";
-      document.getElementById("profileColor").value = localStorage.getItem("baconColor") || "#ff5757";
+      document.getElementById("profileColor").value = localStorage.getItem("baconColor") || "#2f1b0c";
       renderFeed();
     };
   </script>
