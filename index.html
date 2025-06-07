@@ -2,99 +2,228 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Bacon Social (Desktop)</title>
+  <title>Bacon Social Desktop</title>
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg: #fff3f0;
+      --text: #333;
+      --card: #fff;
+      --button: #ff5757;
+      --post: #ffecec;
+      --admin: #fff0d9;
+      --shadow: rgba(0,0,0,0.1);
+    }
+    body.dark {
+      --bg: #1e1e1e;
+      --text: #eee;
+      --card: #2a2a2a;
+      --button: #ff5757;
+      --post: #352323;
+      --admin: #3a320c;
+      --shadow: rgba(255,255,255,0.05);
     }
 
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #fff3f0;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    h1 {
-      color: #ff5757;
-    }
-
-    .container {
-      width: 100%;
+    .window {
       max-width: 700px;
-      background: white;
-      padding: 24px;
+      margin: 40px auto 120px;
+      background: var(--card);
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      box-shadow: 0 4px 20px var(--shadow);
     }
 
-    input, select, button {
-      margin: 8px 0;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 2px solid #ff5757;
+    h1 { color: var(--button); }
+
+    input, button {
       width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 2px solid var(--button);
     }
 
     button {
-      background: #ff5757;
+      background: var(--button);
       color: white;
       cursor: pointer;
     }
 
     .post {
-      background: #ffecec;
-      margin: 12px 0;
-      padding: 12px;
+      margin: 10px 0;
+      background: var(--post);
+      padding: 10px;
       border-radius: 8px;
-    }
-
-    .post strong {
-      color: #ff5757;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
     }
 
     .admin {
-      background: #fff0d9;
+      background: var(--admin);
       border-left: 5px solid gold;
+    }
+
+    .pfp {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--button);
+    }
+
+    #taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #222;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      z-index: 999;
+    }
+
+    #startBtn {
+      background: #444;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #startMenu {
+      position: fixed;
+      bottom: 48px;
+      left: 12px;
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      width: 180px;
+      display: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    #startMenu button {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      border: none;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #startMenu button:hover {
+      background: #f0f0f0;
+    }
+
+    #settingsPanel {
+      display: none;
+      position: fixed;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      background: white;
+      border: 2px solid var(--button);
+      padding: 20px;
+      border-radius: 12px;
+      z-index: 1000;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
     }
   </style>
 </head>
 <body>
-  <h1>🥓 Bacon Social</h1>
-  <div class="container">
-    <input type="text" id="username" placeholder="Your name">
-    <input type="color" id="profileColor" value="#ff5757" title="Choose your color">
-    <button onclick="saveSettings()">Save Settings</button>
-
-    <hr>
-
+  <div class="window">
+    <h1>🥓 Bacon Social</h1>
     <input type="text" id="textPost" placeholder="What's on your mind?">
     <button onclick="postText()">Post</button>
-
     <div id="feed"></div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="overlay" onclick="hideSettings()"></div>
+  <div id="settingsPanel">
+    <h3>Settings</h3>
+    <input type="text" id="username" placeholder="Your name">
+    <input type="color" id="profileColor" value="#ff5757">
+    <input type="file" id="profilePicUpload" accept="image/*">
+    <img id="pfpPreview" style="width:60px;height:60px;border-radius:50%;margin-top:10px;display:none">
+    <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
+    <button onclick="saveSettings()">Save Settings</button>
+    <button onclick="hideSettings()">Close</button>
+  </div>
+
+  <!-- Taskbar -->
+  <div id="taskbar">
+    <button id="startBtn" onclick="toggleStartMenu()">Start</button>
+  </div>
+
+  <!-- Start Menu -->
+  <div id="startMenu">
+    <button onclick="openSettings()">👤 Profile Settings</button>
+    <button onclick="alert('Bacon Social with Dark Mode and Profile Pictures\nBy DTR')">ℹ️ About</button>
   </div>
 
   <script>
     const adminNames = ["DaymianGT", "NovaGT"];
 
+    function toggleStartMenu() {
+      const menu = document.getElementById("startMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function openSettings() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("settingsPanel").style.display = "block";
+      document.getElementById("startMenu").style.display = "none";
+      loadSettings();
+    }
+
+    function hideSettings() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("settingsPanel").style.display = "none";
+    }
+
     function loadSettings() {
       document.getElementById("username").value = localStorage.getItem("baconUsername") || "";
       document.getElementById("profileColor").value = localStorage.getItem("baconColor") || "#ff5757";
+      const pfp = localStorage.getItem("baconPFP");
+      if (pfp) {
+        document.getElementById("pfpPreview").src = pfp;
+        document.getElementById("pfpPreview").style.display = "block";
+      }
+      document.getElementById("darkModeToggle").checked = localStorage.getItem("baconDarkMode") === "true";
+      document.body.classList.toggle("dark", document.getElementById("darkModeToggle").checked);
     }
 
     function saveSettings() {
       const name = document.getElementById("username").value.trim();
       const color = document.getElementById("profileColor").value;
+      const dark = document.getElementById("darkModeToggle").checked;
 
       if (!name) return;
 
       const adminRegistry = JSON.parse(localStorage.getItem("baconAdmins") || "{}");
-
       if (adminNames.includes(name) && !adminRegistry[name]) {
         adminRegistry[name] = true;
         localStorage.setItem("baconAdmins", JSON.stringify(adminRegistry));
@@ -105,25 +234,44 @@
 
       localStorage.setItem("baconUsername", name);
       localStorage.setItem("baconColor", color);
+      localStorage.setItem("baconDarkMode", dark);
+      document.body.classList.toggle("dark", dark);
+
+      hideSettings();
       renderFeed();
     }
 
+    document.getElementById("profilePicUpload").addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        localStorage.setItem("baconPFP", e.target.result);
+        document.getElementById("pfpPreview").src = e.target.result;
+        document.getElementById("pfpPreview").style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+
     function postText() {
-      const value = document.getElementById("textPost").value.trim();
-      if (!value) return;
+      const text = document.getElementById("textPost").value.trim();
+      if (!text) return;
 
       const name = localStorage.getItem("baconUsername") || "Anonymous";
       const color = localStorage.getItem("baconColor") || "#ff5757";
       const isAdmin = localStorage.getItem("baconIsAdmin") === "true";
+      const pfp = localStorage.getItem("baconPFP") || "";
 
       let posts = JSON.parse(localStorage.getItem("baconPosts") || "[]");
       posts.unshift({
-        text: value,
+        text,
         name,
         color,
         time: new Date().toLocaleTimeString(),
-        admin: isAdmin
+        admin: isAdmin,
+        pfp
       });
+
       localStorage.setItem("baconPosts", JSON.stringify(posts));
       document.getElementById("textPost").value = "";
       renderFeed();
@@ -132,14 +280,13 @@
     function renderFeed() {
       const feed = document.getElementById("feed");
       feed.innerHTML = "";
-
       const posts = JSON.parse(localStorage.getItem("baconPosts") || "[]");
       posts.slice(0, 20).forEach(post => {
         const div = document.createElement("div");
         div.className = "post" + (post.admin ? " admin" : "");
-        div.style.borderColor = post.color;
         const label = post.admin ? `${post.name} (Admin)` : post.name;
-        div.innerHTML = `<strong style="color:${post.color}">${label}</strong><br>${post.text}<br><small>${post.time}</small>`;
+        const img = post.pfp ? `<img src="${post.pfp}" class="pfp">` : `<div class="pfp" style="background:${post.color}"></div>`;
+        div.innerHTML = `${img}<div><strong style="color:${post.color}">${label}</strong><br>${post.text}<br><small>${post.time}</small></div>`;
         feed.appendChild(div);
       });
     }
@@ -147,6 +294,12 @@
     window.onload = () => {
       loadSettings();
       renderFeed();
+    };
+
+    window.onclick = (e) => {
+      if (!e.target.closest("#startMenu") && e.target.id !== "startBtn") {
+        document.getElementById("startMenu").style.display = "none";
+      }
     };
   </script>
 </body>
